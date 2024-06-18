@@ -1,0 +1,97 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #b3e5fc; /* Fondo azul más claro */
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff; /* Fondo blanco */
+    border-bottom: 5px solid #ffcc00; /* Línea amarilla en la parte inferior */
+}
+
+.header img {
+    max-width: 150px; /* Tamaño del logo */
+    height: auto;
+}
+
+.header .left {
+    display: flex;
+    align-items: center;
+}
+
+.header .right {
+    display: flex;
+    align-items: center;
+}
+
+.header .right img {
+    margin-left: 10px;
+}
+
+button {
+    background-color: #a4c639; /* Color verde oliva claro */
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #8fbf2f; /* Color verde oliva un poco más oscuro al pasar el ratón */
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 120px);
+}
+
+form {
+    background-color: #ffcc00; /* Fondo del formulario igual al de la línea amarilla */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333; /* Texto oscuro */
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #a4c639; /* Color verde oliva claro */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #8fbf2f; /* Color verde oliva un poco más oscuro al pasar 
+}

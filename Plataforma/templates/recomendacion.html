@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Recomendación</title>
+  <link rel="stylesheet" href="/css/style_r.css" />
+  <link rel="icon" type="image/jpg" href="/static/favicon.webp"/>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+
+  <div class="header">
+  <a href="/">
+      <img src="/static/Leeduca.png" alt="Leeduca Logo">
+  </a>
+    <img src="/static/BioSip.png" alt="Biosip Logo">
+  </div>
+
+  <div id="container">
+    <form id="recomendation-form">
+      <div id="recommendation-container">
+        <h2>Intervención</h2>
+        <p><span id="recommendation"></span></p>
+        <input type="hidden" name="button_value" id="button_value" value="">
+        <input type="hidden" name="pos_list_value" id="pos_list_value" value="">
+        <button type="button" id="bienButton" value='y'>Bien</button>
+        <button type="button" id="malButton" value='n'>Mal</button>
+    </form>
+  </div>
+
+
+  <script>
+    // Función para actualizar la palabra en el contenedor
+    function actualizarPalabra(palabra,posicion) {
+      $("#recommendation").text(palabra);
+      $("#pos_list_value").val(posicion);
+    }
+
+    // Función para obtener la primera palabra del servidor al cargar la página
+    function obtenerPrimeraPalabra() {
+      // Realizar una solicitud AJAX al servidor para obtener la primera palabra
+      $.ajax({
+        url: "/obtener_palabra",
+        method: "POST",
+        data: { button_value: "y" },
+        success: function (response) {
+          // Llamar a la función de actualización con la palabra recibida
+          actualizarPalabra(response.palabra,response.posicion);
+          console.log(response.posicion)
+        },
+        error: function (error) {
+          console.error("Error al obtener la primera palabra del servidor:", error);
+        }
+      });
+    }
+
+    function obtenerNuevaPalabra() {
+
+      // **Enviar el valor del botón y la variable pos_list a /actualizar_SR**
+      var data = {
+        button_value: $("#button_value").val(),
+        pos_list: JSON.stringify($("#pos_list_value").val())
+        // Incluir otros datos necesarios para la ruta /actualizar_SR
+      };
+
+      $.ajax({
+        url: "/actualizar_SR",
+        method: "POST",
+        data: data,
+        error: function (error) {
+          console.error("Error al actualizar SR:", error);
+        },
+        success: function (response) {
+          // Si la respuesta de actualizar_SR es exitosa, obtener la nueva palabra
+          $.ajax({
+            url: "/obtener_palabra",
+            method: "POST",
+            data: { button_value: $("#button_value").val() },
+            success: function (response) {
+              if(response.n_palabras <= 100){
+                // Llamar a la función de actualización con la palabra recibida
+                console.log("Server response:", response);
+                actualizarPalabra(response.palabra,response.posicion);
+              }else{
+                window.location.href = response.redirect_url;
+              }
+            },
+            error: function (error) {
+              console.error("Error al obtener la palabra del servidor:", error);
+            }
+          });
+        }
+      });
+    }
+
+    // Función para enviar el feedback al servidor al hacer clic en un botón
+    $("#bienButton, #malButton").on("click", function () {
+      var isGood = $(this).val() === 'y';
+
+      if (isGood) {
+        $("#button_value").val('y');
+      }else{
+        $("#button_value").val('n');
+      }
+      obtenerNuevaPalabra()
+    });
+
+    // Inicializar la página obteniendo la primera palabra del servidor al cargar la página
+    $(document).ready(function () {
+      obtenerPrimeraPalabra();
+    });
+  </script>
+</body>
+
+</html>

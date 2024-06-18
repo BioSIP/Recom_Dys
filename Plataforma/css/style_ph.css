@@ -1,0 +1,127 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #b3e5fc; /* Fondo azul más claro */
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem; /* Usar rem para padding */
+    background-color: #fff; /* Fondo blanco */
+    border-bottom: 5px solid #ffcc00; /* Línea amarilla en la parte inferior */
+    width: 100%;
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+.header img {
+    max-width: 150px; /* Tamaño del logo */
+    height: auto;
+}
+
+.header .left {
+    display: flex;
+    align-items: center;
+}
+
+.header .right {
+    display: flex;
+    align-items: center;
+}
+
+.header .right img {
+    margin-left: 10px;
+}
+
+button {
+    background-color: #a4c639; /* Color verde oliva claro */
+    color: #fff;
+    padding: 0.75rem 1.5rem; /* Usar rem para padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem; /* Usar rem para fuente */
+    margin: 0.5rem; /* Usar rem para margen */
+    transition: background-color 0.3s ease;
+}
+
+#malButton {
+    background-color: #e53935; /* Color rojo */
+}
+
+button:hover {
+    background-color: #8fbf2f; /* Color verde oliva un poco más oscuro al pasar el ratón */
+}
+
+#container {
+    flex: 1; /* Toma el espacio disponible */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem; /* Usar rem para padding */
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+#word-form {
+    background-color: #ffcc00; /* Fondo del formulario igual al de la línea amarilla */
+    padding: 1.5rem; /* Usar rem para padding */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px; /* Máximo ancho del formulario */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#word-form h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#word-form #word-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#word-form p {
+    margin-bottom: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Fuente infantil */
+    font-size: 1.5rem; /* Usar rem para fuente */
+    border: 2px solid #000; /* Borde negro */
+    background-color: #fff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 10px; /* Espacio interno para el borde */
+}
+
+#word-form button {
+    background-color: #a4c639; /* Color verde oliva claro */
+    color: #fff;
+    padding: 0.75rem 1rem; /* Usar rem para padding */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0.5rem; /* Usar rem para margen */
+    transition: background-color 0.3s ease;
+    width: 45%; /* Ajustar el tamaño de los botones */
+}
+
+#word-form #malButton {
+    background-color: #e53935; /* Color rojo */
+}
+
+#word-form button:hover {
+    background-color: #8fbf2f; /* Color verde oliva un poco más oscuro al pasar el ratón */
+}

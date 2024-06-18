@@ -1,0 +1,55 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #b3e5fc; /* Fondo azul más claro */
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem; /* Usar rem para padding */
+    background-color: #fff; /* Fondo blanco */
+    border-bottom: 5px solid #ffcc00; /* Línea amarilla en la parte inferior */
+    width: 100%;
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+.header img {
+    max-width: 150px; /* Tamaño del logo */
+    height: auto;
+}
+
+.header .left {
+    display: flex;
+    align-items: center;
+}
+
+.header .right {
+    display: flex;
+    align-items: center;
+}
+
+.header .right img {
+    margin-left: 10px;
+}
+
+h1 {
+    text-align: center;
+    color: #fafafa; /* Color amarillo */
+    font-size: 2.5rem; /* Tamaño de fuente más grande */
+    margin-top: 2rem;
+    -webkit-text-stroke: 1px #000;
+}
+
+p {
+    text-align: center;
+    font-size: 1.5rem; /* Tamaño de fuente */
+    margin-top: 1rem;
+}

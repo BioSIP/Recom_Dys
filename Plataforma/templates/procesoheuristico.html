@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Proceso heurístico</title>
+  <link rel="stylesheet" href="/css/style_ph.css" />
+  <link rel="icon" type="image/jpg" href="/static/favicon.webp"/>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+  <div class="header">
+    <a href="/">
+      <img src="/static/Leeduca.png" alt="Leeduca Logo">
+    </a>
+    <img src="/static/BioSip.png" alt="BioSip Logo">
+  </div>
+
+  <div id="container">
+    <form id="word-form">
+      <div id="word-container">
+        <h2>Proceso Heurístico</h2>
+        <p id="word">{{ word_list[0] }}</p>
+      </div>
+      <input type="hidden" name="button_value" id="button_value" value="">
+      <input type="hidden" name="pos_list_value" id="pos_list_value" value="">
+      <input type="hidden" name="is_last_element" id="is_last_element" value="">
+
+      <button type="button" id="bienButton" value='y'>Bien</button>
+      <button type="button" id="malButton" value='n'>Mal</button>
+    </form>
+  </div>
+  
+  <script>
+    var currentWordIndex = 0;
+    var wordList = {{ word_list | tojson | safe }};
+    var posList = {{ l_posiciones | tojson | safe }};
+    var isLastElement = false;
+
+    $(document).ready(function () {
+      $("#bienButton, #malButton").on("click", function () {
+        var isGood = $(this).val() === 'y';
+
+        if (currentWordIndex < wordList.length - 1) {
+          currentWordIndex++;
+          $("#word").text(wordList[currentWordIndex]);
+        } else {
+          alert('Fin del proceso heuristico!!!!!!!');
+          isLastElement = true
+        }
+
+        $("#is_last_element").val(isLastElement ? '1' : '0');
+        $("#button_value").val(isGood ? 'y' : 'n');
+        $("#pos_list_value").val(posList[currentWordIndex]);
+
+        // Enviar datos al servidor de forma asíncrona
+        $.ajax({
+          type: "POST",
+          url: "/proceso_heuristico",
+          data: $("#word-form").serialize(),
+          success: function (response) {
+            console.log("Server response:", response);
+            if (response !== null) {
+                window.location.href = response.redirect_url;
+            }
+          },
+          error: function (error) {
+            console.error("Error:", error);
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
