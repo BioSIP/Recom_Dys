@@ -14,10 +14,7 @@ import warnings
 from pathlib import Path
 import math
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 from generadorpalabras import *
 from niñosvirtuales import *
 
@@ -289,57 +286,76 @@ def calculate_mse(predictions, actual_ratings):
     return mean_squared_error(actual_ratings[non_zero_indices], predictions[non_zero_indices])
 
 def SGD_inference(M2):
-    # Convertir la matriz a numpy y manejar NaN
     ratings = np.array(M2)
     ratings = np.where(ratings == 0, np.nan, ratings)
-    non_nan_indices = np.where(~np.isnan(ratings))
-    
-    # Configurar los datos para entrenamiento y pruebas
-    X = np.column_stack(non_nan_indices)
-    y = ratings[non_nan_indices]
-    
-    # Crear un pipeline con StandardScaler y SGDRegressor
-    pipeline = Pipeline([
-        ('scaler', StandardScaler()),
-        ('regressor', SGDRegressor(random_state=42))
-    ])
-    
-    # Configuración de los hiperparámetros a explorar
-    param_grid = {
-        'regressor__alpha': [0.01, 0.001],
-        'regressor__eta0': [0.01, 0.001],
-        'regressor__n_iter_no_change': [5, 10],
-        'regressor__learning_rate': ['constant'],
-        'regressor__max_iter': [500, 1000, 10000],
-    }
 
-    
-    # Usar GridSearchCV para optimización de hiperparámetros
-    grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='neg_mean_squared_error')
-    
-    # Entrenar el modelo
-    grid_search.fit(X, y)
-    
-    # Obtener los mejores hiperparámetros
-    best_model = grid_search.best_estimator_
-    
-    # Crear todas las combinaciones de usuarios e ítems
-    n_users, n_items = ratings.shape
-    user_indices, item_indices = np.meshgrid(np.arange(n_users), np.arange(n_items), indexing='ij')
-    X_all = np.column_stack((user_indices.ravel(), item_indices.ravel()))
-    
-    # Realizar predicciones para todas las combinaciones de usuarios e ítems
-    all_predictions = best_model.predict(X_all)
-    
-    # Reestructurar las predicciones para coincidir con la forma de la matriz de calificaciones
-    all_predictions_matrix = all_predictions.reshape((n_users, n_items)) # type: ignore
-    
-    # Calcular el MSE y RMSE
-    mse = calculate_mse(all_predictions_matrix, ratings)
-    rmse = math.sqrt(mse)
-    
-    return all_predictions_matrix
+    # Crear conjuntos de entrenamiento y prueba.
+    pct_entrenamiento = 0.8
+    total_ratings = np.count_nonzero(~np.isnan(ratings))
+    num_entrenamiento = int(pct_entrenamiento * total_ratings)
 
+    indices = np.column_stack(np.where(~np.isnan(ratings)))
+    np.random.shuffle(indices)
+    indices_entrenamiento = indices[:num_entrenamiento]
+    indices_prueba = indices[num_entrenamiento:]
+
+    train_data = np.full_like(ratings, np.nan)
+    test_data = np.full_like(ratings, np.nan)
+
+    for idx in indices_entrenamiento:
+        train_data[idx[0], idx[1]] = ratings[idx[0], idx[1]]
+
+    for idx in indices_prueba:
+        test_data[idx[0], idx[1]] = ratings[idx[0], idx[1]]
+
+    # Configuración de la validación cruzada y de los hiperparámetros a explorar
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    n_factors_values = [2, 3, 4]
+    learning_rate_values = [0.01, 0.001]
+    n_epochs_values = [50, 100]
+    non_nan_idx = np.column_stack(np.where(~np.isnan(train_data)))
+
+    # Grid search sobre los hiperparámetros
+    min_mse = float('inf')
+    best_params = None
+    for n_factors in n_factors_values:
+        for learning_rate in learning_rate_values:
+            for n_epochs in n_epochs_values:
+                fold_mses = []
+                for train_idx, val_idx in kf.split(non_nan_idx):
+                    train_subset = np.copy(train_data)
+                    val_idx_tuple = non_nan_idx[val_idx]
+                    train_subset[val_idx_tuple[:, 0], val_idx_tuple[:, 1]] = np.nan
+
+                    # Entrenamiento
+                    U, I = train_SGD(train_subset, n_factors, learning_rate, n_epochs)
+                    predictions = np.dot(U, I.T)
+
+                    # Validación
+                    val_real_ratings = train_data[val_idx_tuple[:, 0], val_idx_tuple[:, 1]]
+                    val_predicted_ratings = predictions[val_idx_tuple[:, 0], val_idx_tuple[:, 1]]
+                    fold_mse = calculate_mse(val_predicted_ratings, val_real_ratings)
+                    fold_mses.append(fold_mse)
+
+                # Promedio de MSE en todos los folds
+                avg_mse = np.mean(fold_mses)
+                if avg_mse < min_mse:
+                    min_mse = avg_mse
+                    best_params = (n_factors, learning_rate, n_epochs)
+
+    # Entrenamiento y evaluación con los mejores hiperparámetros sobre todos los datos
+    best_factors, best_lr, best_epochs = best_params
+    U, I = train_SGD(train_data, best_factors, best_lr, best_epochs)
+    all_predictions = np.dot(U, I.T)
+
+    print(f"Mejores hiperparámetros: {best_params}")
+    min_rmse = math.sqrt(min_mse)
+    print(f"RMSE de la CV con optimización de hiperparámetros: {min_rmse}")
+    # Entrenamiento y test con los mejores hiperparámetros
+    final_rmse_test = math.sqrt(calculate_mse(all_predictions, test_data))
+    print(f"RMSE de la CV con optimización de hiperparámetros: {final_rmse_test}")
+
+    return all_predictions
 
 def init_score(respuesta, m_score):
     """
